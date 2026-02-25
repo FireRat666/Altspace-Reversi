@@ -1,5 +1,5 @@
 (function () {
-BS.BanterScene.GetInstance().On("unity-loaded", async () => {
+window.addEventListener("unity-loaded", async () => {
     /**
      * Banter Reversi (Othello) Embed Script
      * A fully synced multiplayer Reversi game for Banter.
