@@ -1,4 +1,5 @@
 (function () {
+BS.BanterScene.GetInstance().On("unity-loaded", async () => {
     /**
      * Banter Reversi (Othello) Embed Script
      * A fully synced multiplayer Reversi game for Banter.
@@ -252,19 +253,6 @@
         pendingSync: false
     };
     state.offset = (state.boardSize * state.tileSize) / 2 - (state.tileSize / 2);
-
-    async function init() {
-        if (!window.BS) {
-            console.error("Banter SDK not found.");
-            return;
-        }
-        // Initialize game logic
-        if (!window.reversiGame) {
-            window.reversiGame = new ReversiGame();
-        }
-
-        BS.BanterScene.GetInstance().On("unity-loaded", setupScene);
-    }
 
     async function setupScene() {
         console.log("Reversi: Setup Scene Started");
@@ -698,5 +686,11 @@
         });
     }
 
-    init();
+    // Initialize game logic
+    if (!window.reversiGame) {
+        window.reversiGame = new ReversiGame();
+    }
+    setupScene();
+
+})
 })();
