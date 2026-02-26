@@ -1,5 +1,5 @@
-(function () {
 window.addEventListener("unity-loaded", async () => {
+(function () {
     /**
      * Banter Reversi (Othello) Embed Script
      * A fully synced multiplayer Reversi game for Banter.
@@ -692,5 +692,5 @@ window.addEventListener("unity-loaded", async () => {
     }
     setupScene();
 
-})
 })();
+});
