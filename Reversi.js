@@ -1,4 +1,3 @@
-window.addEventListener("unity-loaded", async () => {
 (function () {
     /**
      * Banter Reversi (Othello) Embed Script
@@ -41,17 +40,10 @@ window.addEventListener("unity-loaded", async () => {
         return defaultVal;
     };
 
-    function getModelUrl(modelName) {
-        try {
-            if (currentScript) {
-                return new URL(`../Models/${modelName}`, currentScript.src).href;
-            }
-        } catch (e) { console.error("Error resolving model URL:", e); }
-        return `../Models/${modelName}`;
-    }
-
-    // Parse URL params from this script tag
+    // Parse URL params from this script tag immediately
     const currentScript = document.currentScript;
+    const scriptSrc = currentScript ? currentScript.src : null;
+
     if (currentScript) {
         const url = new URL(currentScript.src);
         const params = new URLSearchParams(url.search);
@@ -70,6 +62,15 @@ window.addEventListener("unity-loaded", async () => {
         config.resetPosition = parseVector3(params.get('resetPosition'), config.resetPosition);
         config.resetRotation = parseVector3(params.get('resetRotation'), config.resetRotation);
         config.resetScale = parseVector3(params.get('resetScale'), config.resetScale);
+    }
+
+    function getModelUrl(modelName) {
+        try {
+            if (scriptSrc) {
+                return new URL(`../Models/${modelName}`, scriptSrc).href;
+            }
+        } catch (e) { console.error("Error resolving model URL:", e); }
+        return `../Models/${modelName}`;
     }
 
     // --- Reversi Game Logic ---
@@ -256,30 +257,6 @@ window.addEventListener("unity-loaded", async () => {
 
     async function setupScene() {
         console.log("Reversi: Setup Scene Started");
-
-        // Convert config array values to BS.Vector3 now that BS is available
-        config.boardPosition = new BS.Vector3(...config.boardPosition);
-        config.boardRotation = new BS.Vector3(...config.boardRotation);
-        config.boardScale = new BS.Vector3(...config.boardScale);
-        config.resetPosition = new BS.Vector3(...config.resetPosition);
-        config.resetRotation = new BS.Vector3(...config.resetRotation);
-        config.resetScale = new BS.Vector3(...config.resetScale);
-
-        // Re-parse URL params to ensure BS.Vector3 conversion for any overridden values
-        // This is necessary because parseVector3 now returns arrays, and we need BS.Vector3 objects
-        const currentScript = document.currentScript;
-        if (currentScript) {
-            const url = new URL(currentScript.src);
-            const params = new URLSearchParams(url.search);
-
-            if (params.has('boardScale')) config.boardScale = new BS.Vector3(...parseVector3(params.get('boardScale'), [1,1,1]));
-            if (params.has('boardPosition')) config.boardPosition = new BS.Vector3(...parseVector3(params.get('boardPosition'), [0,1.1,0]));
-            if (params.has('boardRotation')) config.boardRotation = new BS.Vector3(...parseVector3(params.get('boardRotation'), [0,0,0]));
-
-            if (params.has('resetScale')) config.resetScale = new BS.Vector3(...parseVector3(params.get('resetScale'), [1,1,1]));
-            if (params.has('resetPosition')) config.resetPosition = new BS.Vector3(...parseVector3(params.get('resetPosition'), [0,-0.4,0]));
-            if (params.has('resetRotation')) config.resetRotation = new BS.Vector3(...parseVector3(params.get('resetRotation'), [0,0,0]));
-        }
 
         state.boardRoot = await new BS.GameObject("ReversiBoardRoot").Async();
         
@@ -711,11 +688,35 @@ window.addEventListener("unity-loaded", async () => {
         });
     }
 
-    // Initialize game logic
-    if (!window.reversiGame) {
-        window.reversiGame = new ReversiGame();
+    // --- Main Initializer ---
+    let initialized = false;
+    const initGame = async () => {
+        if (initialized) return;
+        initialized = true;
+        console.log("Reversi: Initializing Game...");
+
+        // Initialize game logic
+        if (!window.reversiGame) {
+            window.reversiGame = new ReversiGame();
+        }
+
+        // Convert config arrays to BS.Vector3 now that BS is available
+        config.boardPosition = new BS.Vector3(...config.boardPosition);
+        config.boardRotation = new BS.Vector3(...config.boardRotation);
+        config.boardScale = new BS.Vector3(...config.boardScale);
+        config.resetPosition = new BS.Vector3(...config.resetPosition);
+        config.resetRotation = new BS.Vector3(...config.resetRotation);
+        config.resetScale = new BS.Vector3(...config.resetScale);
+
+        await setupScene();
+    };
+
+    // --- Check for BS availability ---
+    if (window.BS) {
+        initGame();
+    } else {
+        window.addEventListener("unity-loaded", initGame);
+        window.addEventListener("bs-loaded", initGame);
     }
-    setupScene();
 
 })();
-});
