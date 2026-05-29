@@ -14,35 +14,41 @@ A fully synchronized multiplayer Reversi (Othello) game designed for Banter spac
 
 To add Reversi to your Banter space, simply include the script in your `index.html` file. You can host the file yourself or use a direct link if available.
 
+**HTML Script Attributes (Recommended):**
 ```html
-<script src="https://banter-reversi.firer.at/Reversi.js?boardPosition=0 1.1 -2&boardRotation=0 0 0"></script>
+<script src="https://banter-reversi.firer.at/Reversi.js" boardPosition="0 1.1 -2" boardRotation="0 0 0"></script>
+```
+
+**Legacy URL Query Parameters:**
+```html
+<script src="https://banter-reversi.firer.at/Reversi.js?boardPosition=0+1.1+-2&boardRotation=0+0+0"></script>
 ```
 
 ## Configuration
 
-You can configure the board's placement and behavior using query parameters in the script `src` URL.
+You can configure the board's placement and behavior using **HTML script attributes** (recommended) or legacy **URL query parameters** (for backwards compatibility).
 
-| Parameter | Type | Default | Description |
+| Parameter / Attribute | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `boardPosition` | Vector3 | `0 1.1 -2` | The world position of the board center (x y z). |
-| `boardRotation` | Vector3 | `0 0 0` | The rotation of the board in Euler angles (x y z). |
-| `boardScale` | Vector3 | `1 1 1` | The scale of the board (x y z). |
-| `resetPosition` | Vector3 | `0 0 2.5` | The local position of the reset button relative to the board. |
-| `resetRotation` | Vector3 | `0 0 0` | The local rotation of the reset button. |
-| `resetScale` | Vector3 | `1 1 1` | The local scale of the reset button. |
-| `hideUI` | Boolean | `false` | If `true`, the reset button will not be created. |
+| `boardPosition` / `position` / `board-position` | Vector3 | `0 1.1 -2` | The world position of the board center (x y z). |
+| `boardRotation` / `rotation` / `board-rotation` | Vector3 | `0 0 0` | The rotation of the board in Euler angles (x y z). |
+| `boardScale` / `scale` / `board-scale` | Vector3 | `1 1 1` | The scale of the board (x y z). |
+| `resetPosition` / `reset-position` | Vector3 | `0 0 2.5` | The local position of the reset button relative to the board. |
+| `resetRotation` / `reset-rotation` | Vector3 | `0 0 0` | The local rotation of the reset button. |
+| `resetScale` / `reset-scale` | Vector3 | `1 1 1` | The local scale of the reset button. |
+| `hideUI` / `hide-ui` | Boolean | `false` | If `true`, the reset button will not be created. |
 | `instance` | String | *URL* | A unique ID for this board. Use this if you have multiple boards in one scene to keep their states separate. |
 
-### Example: Multiple Boards
+### Example: Multiple Boards (using Attributes)
 
 If you want two separate games going on in the same space, give them unique `instance` IDs:
 
 ```html
 <!-- Table 1 -->
-<script src="https://banter-reversi.firer.at/Reversi.js?instance=table1&boardPosition=5 1 0"></script>
+<script src="https://banter-reversi.firer.at/Reversi.js" instance="table1" boardPosition="5 1 0"></script>
 
 <!-- Table 2 -->
-<script src="https://banter-reversi.firer.at/Reversi.js?instance=table2&boardPosition=-5 1 0"></script>
+<script src="https://banter-reversi.firer.at/Reversi.js" instance="table2" boardPosition="-5 1 0"></script>
 ```
 
 ## How to Play
