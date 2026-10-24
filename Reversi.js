@@ -1,4 +1,6 @@
 (function () {
+    // One game per copy of this script, so several boards on a page don't share a game.
+    let reversiGame = null;
     /**
      * Banter Reversi (Othello) Embed Script
      * A fully synced multiplayer Reversi game for Banter.
@@ -441,7 +443,7 @@
 
         btn.On('click', () => {
             console.log("Reversi: Reset clicked");
-            window.reversiGame.reset();
+            reversiGame.reset();
             syncState();
         });
     }
@@ -559,7 +561,7 @@
     }
 
     function handleSquareClick(row, col) {
-        const game = window.reversiGame;
+        const game = reversiGame;
         console.log(`Clicked: (${row}, ${col})`);
         console.log(`Current Player: ${game.currentPlayer}`);
         console.log(`Game Over: ${game.gameOver}, Is Syncing: ${state.isSyncing}`);
@@ -584,7 +586,7 @@
 
     function syncState() {
         const key = `reversi_game_${config.instance}`;
-        const data = window.reversiGame.getState();
+        const data = reversiGame.getState();
         BS.BanterScene.GetInstance().SetPublicSpaceProps({ [key]: JSON.stringify(data) });
         // Optimistic update
         syncBoard();
@@ -598,7 +600,7 @@
         state.syncLock = true;
 
         try {
-            const game = window.reversiGame;
+            const game = reversiGame;
             const size = state.tileSize;
             const syncPromises = [];
 
@@ -655,7 +657,7 @@
                                 if (!config.useCustomModels) {
                                      // Standard: update color
                                     const colorHex = (cell === 1) ? COLORS.black : COLORS.white;
-                                    const mat = piece.GetComponent(BS.ComponentType.BanterMaterial);
+                                    const mat = piece.GetComponent((BS.ComponentType.Material ?? BS.ComponentType.BanterMaterial));
                                     if (mat) mat.color = hexToVector4(colorHex);
                                 } else {
                                      // Custom Models: Ensure type tag is set
@@ -695,7 +697,7 @@
                     const key = `${r}_${c}`;
                     const tile = state.tiles[key];
                     if (tile) {
-                        const mat = tile.GetComponent(BS.ComponentType.BanterMaterial);
+                        const mat = tile.GetComponent((BS.ComponentType.Material ?? BS.ComponentType.BanterMaterial));
                         if (mat) {
                             const isValid = !config.hideBoard && !game.gameOver && game.getCaptures(r, c, game.currentPlayer).length > 0;
                             mat.color = hexToVector4(isValid ? COLORS.valid : COLORS.board);
@@ -730,7 +732,7 @@
         if (val) {
             try {
                 const data = JSON.parse(val);
-                window.reversiGame.loadState(data);
+                reversiGame.loadState(data);
                 syncBoard();
             } catch (e) {
                 console.error("Failed to parse reversi state", e);
@@ -749,7 +751,7 @@
                 if (val) {
                     try {
                         const data = JSON.parse(val);
-                        window.reversiGame.loadState(data);
+                        reversiGame.loadState(data);
                         syncBoard(); // This will unlock at the end
                     } catch (e) { 
                         console.error(e);
@@ -770,8 +772,8 @@
         console.log("Reversi: Initializing Game...");
 
         // Initialize game logic
-        if (!window.reversiGame) {
-            window.reversiGame = new ReversiGame();
+        if (!reversiGame) {
+            reversiGame = new ReversiGame();
         }
 
         // Convert config arrays to BS.Vector3 now that BS is available
