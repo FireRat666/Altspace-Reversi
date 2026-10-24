@@ -1,32 +1,21 @@
-# Banter Reversi (Othello)
+# Reversi
 
-A fully synchronized multiplayer Reversi (Othello) game designed for Banter spaces. Players can place pieces on an 8x8 board, capture opponent pieces by flanking them, and the game state is automatically synced between all users in the space.
+A synced multiplayer Reversi (Othello) board. Made for **SideQuest / AltspaceVR** worlds, and it also works in **Banter**.
+
+There is no server: players stay in sync through the space's shared state, and the game is plain static files served from <https://reversi.firer.at>.
+
+To try it, open <https://reversi.firer.at> in Altspace or Banter.
 
 ## Features
 
-* **Multiplayer Sync**: Game state (board, current player, winner) is synced via Banter's `SetPublicSpaceProps`.
-* **Valid Move Highlighting**: Valid moves for the current player are highlighted in blue on the board.
-* **Automatic Rules**: Enforces standard Reversi rules, including flanking captures and turn passing if no moves are available.
-* **Reset Functionality**: Includes a physical reset button to restart the game.
-* **Customizable**: Position, rotation, and scale can be configured via URL parameters.
+- Valid moves highlighted in blue
+- Turns pass automatically when a player has no move
+- Reset button
+- Several independent boards in one world
 
-## Installation
+## Add it to an Altspace world (snippet)
 
-To add Reversi to your Banter space, simply include the script in your `index.html` file. You can host the file yourself or use a direct link if available.
-
-**HTML Script Attributes (Recommended):**
-```html
-<script src="https://banter-reversi.firer.at/Reversi.js" boardPosition="0 1.1 -2" boardRotation="0 0 0"></script>
-```
-
-**Legacy URL Query Parameters:**
-```html
-<script src="https://banter-reversi.firer.at/Reversi.js?boardPosition=0+1.1+-2&boardRotation=0+0+0"></script>
-```
-
-## SideQuest / Altspace Creator SDK (Snippet)
-
-In a SideQuest/Altspace Creator SDK world, add an empty GameObject at the origin, click **Add Component > BS > Snippet** and type `reversi`. Or paste it into `Assets/WebRoot/index.html` between the snippet section comments:
+In a Creator SDK world, add an empty GameObject at the origin, click **Add Component > BS > Snippet** and type `reversi`. Or paste this into `Assets/WebRoot/index.html`, between the snippet section comments:
 
 ```html
 <!-- snippet section -->
@@ -49,49 +38,62 @@ In a SideQuest/Altspace Creator SDK world, add an empty GameObject at the origin
 <!-- end snippet section -->
 ```
 
-- Settings are the same as the script attributes above. `position` and `rotation` are Unity world values, and `scale` can be a single number.
 - Each placement is its own game. Its sync id is `room`, or the placement's own id when `room` is empty. Give placements the same `room` to share one game.
-- An empty setting uses the game's default.
+- `position` and `rotation` are Unity world values, and `scale` can be a single number. The other settings are listed under [Settings](#settings). An empty setting uses the default.
 - The Scene-view gizmo shows the board at its default size; it does not follow `scale`.
 - Unity reads the snippet section as XML: quote every attribute, close every element, and write `&` as `&amp;`.
 
-## Configuration
+## Add it with a script tag
 
-You can configure the board's placement and behavior using **HTML script attributes** (recommended) or legacy **URL query parameters** (for backwards compatibility).
-
-| Parameter / Attribute | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `boardPosition` / `position` / `board-position` | Vector3 | `0 1.1 -2` | The world position of the board center (x y z). |
-| `boardRotation` / `rotation` / `board-rotation` | Vector3 | `0 0 0` | The rotation of the board in Euler angles (x y z). |
-| `boardScale` / `scale` / `board-scale` | Vector3 | `1 1 1` | The scale of the board (x y z). |
-| `resetPosition` / `reset-position` | Vector3 | `0 0 2.5` | The local position of the reset button relative to the board. |
-| `resetRotation` / `reset-rotation` | Vector3 | `0 0 0` | The local rotation of the reset button. |
-| `resetScale` / `reset-scale` | Vector3 | `1 1 1` | The local scale of the reset button. |
-| `hideUI` / `hide-ui` | Boolean | `false` | If `true`, the reset button will not be created. |
-| `instance` | String | *URL* | A unique ID for this board. Use this if you have multiple boards in one scene to keep their states separate. |
-
-### Example: Multiple Boards (using Attributes)
-
-If you want two separate games going on in the same space, give them unique `instance` IDs:
+This works in an Altspace world's `Assets/WebRoot/index.html` (outside the snippet section) and in a Banter space's HTML:
 
 ```html
-<!-- Table 1 -->
-<script src="https://banter-reversi.firer.at/Reversi.js" instance="table1" boardPosition="5 1 0"></script>
-
-<!-- Table 2 -->
-<script src="https://banter-reversi.firer.at/Reversi.js" instance="table2" boardPosition="-5 1 0"></script>
+<script src="https://reversi.firer.at/Reversi.js" position="0 1.1 -2"></script>
 ```
 
-## How to Play
+For more than one board in a space, give each one its own `instance`:
 
-1. **Black** moves first.
-2. Click on a valid empty square (highlighted in **Blue**) to place a piece.
-3. A move is valid only if it flanks one or more opponent pieces between the new piece and an existing piece of your color.
-4. Flanked pieces are flipped to your color.
-5. If a player cannot make a valid move, their turn is skipped.
-6. The game ends when the board is full or neither player can move.
-7. The player with the most pieces on the board wins.
+```html
+<script src="https://reversi.firer.at/Reversi.js" instance="board1" position="-2 1.1 -2"></script>
+<script src="https://reversi.firer.at/Reversi.js" instance="board2" position="2 1.1 -2"></script>
+```
 
-## Requirements
+Settings can also go in the URL, as in older setups: `https://reversi.firer.at/Reversi.js?boardPosition=0+1.1+-2&boardScale=0.8`.
 
-* Banter SDK (automatically available in Banter spaces).
+## Settings
+
+| Setting | Also accepted | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `instance` |  | page URL | Sync id. Boards with the same id share one game. In a snippet, use `room` instead. |
+| `boardPosition` | `position`, `board-position` | `0 1.1 -2` | Board position (x y z). |
+| `boardRotation` | `rotation`, `board-rotation` | `0 0 0` | Board rotation in degrees (x y z). |
+| `boardScale` | `scale`, `board-scale` | `1` | Board scale: one number, or x y z. |
+| `resetPosition` | `reset-position` | `0 0 2.5` | Reset button position, relative to the board. |
+| `resetRotation` | `reset-rotation` | `0 0 0` | Reset button rotation, relative to the board. |
+| `resetScale` | `reset-scale` | `1` | Reset button scale. |
+| `hideUI` | `hide-ui` | `false` | `true` hides the buttons. |
+| `hideBoard` | `hide-board` | `false` | `true` hides the board, e.g. to use your own. |
+| `useCustomModels` | `use-custom-models` | `false` | `true` uses the GLB models in `Models/` for the pieces instead of built-in shapes. |
+| `lighting` |  | `unlit` | `lit` uses materials that react to scene lights. |
+| `addLights` | `add-lights` | `true` | With `lighting="lit"`, adds a directional light. Set `false` if the world has its own. |
+
+Settings can be written as `boardPosition` or `board-position`; the snippet uses the hyphenated form.
+
+## How to play
+
+1. Black moves first.
+2. Click a blue square to place a piece. A move must trap at least one opponent piece between the new piece and one of yours.
+3. Trapped pieces flip to your colour.
+4. A player with no valid move is skipped.
+5. The game ends when neither player can move. Most pieces wins.
+
+## Files
+
+- `Reversi.js`: the game.
+- `Models/`: piece models for `use-custom-models`.
+- `snippet.js`, `snippet.html`: the Creator SDK snippet and its definition.
+- `index.html`: a test page with a floor and the game.
+
+## License
+
+GPL-3.0. See [LICENSE](LICENSE).
