@@ -133,7 +133,27 @@
        Reversi embed
        Customize via URL params in the src attribute!
     -->
-    <script src="Reversi.js?boardPosition=0+0.7+-2&boardScale=0.7"></script>
+    <!-- snippet section -->
+    <bs-snippet name="reversi" title="Reversi"
+      description="Synced multiplayer Reversi (Othello) board with a reset button."
+      script="https://reversi.firer.at/snippet.js"
+      room=""
+      position="0 1 2"
+      rotation="0 0 0"
+      scale="0.5"
+      lit="true"
+      add-lights="false"
+      turn-cooldown="5"
+      hide-ui="false"
+      hide-board="false"
+      use-custom-models="true"
+      reset-position="0 0 2.5"
+      reset-rotation="0 0 0"
+      reset-scale="1">
+      <bs-gizmo type="position" attribute="position"/>
+      <bs-gizmo type="box" attribute="position" size="2 0.05 2"/>
+    </bs-snippet>
+    <!-- end snippet section -->
 </body>
 
 </html>
