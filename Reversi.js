@@ -145,6 +145,8 @@
         config.resetPosition = parseVector3(getParam('resetPosition'), config.resetPosition);
         config.resetRotation = parseVector3(getParam('resetRotation'), config.resetRotation);
         config.scoreboardPosition = parseVector3(getParam('scoreboardPosition'), null);
+        // 0 0 0 means automatic (the turn sign's default spot)
+        if (config.scoreboardPosition && config.scoreboardPosition.every(n => n === 0)) config.scoreboardPosition = null;
         config.scoreboardRotation = parseVector3(getParam('scoreboardRotation'), null);
         config.scoreboardScale = parseVector3(getParam('scoreboardScale'), null);
         config.resetScale = parseVector3(getParam('resetScale'), config.resetScale);
@@ -312,7 +314,10 @@
 
     // --- Banter Visuals ---
     const COLORS = {
-        board: '#2E8B57',    // SeaGreen
+        board: '#1E7A46',    // Felt green squares
+        boardBase: '#0E2016', // Shows through the gaps between squares as grid lines
+        frame: '#4A2C16',    // Wooden frame round the board
+        crown: '#F2C230',    // Gold crown on the winner's discs
         black: '#111111',
         white: '#EEEEEE',
         valid: '#50ABF2',    // Blue hint for valid moves
@@ -382,8 +387,60 @@
         syncBoard();
     }
 
+    // A dark base under the squares (the gaps between them read as grid lines), a wooden frame,
+    // and the four small dots of a classic Othello board.
+    async function createBoardBase() {
+        const span = state.boardSize * state.tileSize;
+        const rail = 0.18;
+        const box = (dims, color, pos) => createBanterObject(state.boardRoot, BS.GeometryType.BoxGeometry, dims, color, pos);
+        await box({ width: span, height: 0.1, depth: span }, COLORS.boardBase, new BS.Vector3(0, -0.012, 0));
+        const edge = span / 2 + rail / 2;
+        await box({ width: span + rail * 2, height: 0.14, depth: rail }, COLORS.frame, new BS.Vector3(0, 0, edge));
+        await box({ width: span + rail * 2, height: 0.14, depth: rail }, COLORS.frame, new BS.Vector3(0, 0, -edge));
+        await box({ width: rail, height: 0.14, depth: span }, COLORS.frame, new BS.Vector3(edge, 0, 0));
+        await box({ width: rail, height: 0.14, depth: span }, COLORS.frame, new BS.Vector3(-edge, 0, 0));
+        const dot = state.tileSize * 2;
+        for (const x of [-dot, dot]) {
+            for (const z of [-dot, dot]) {
+                await createBanterObject(state.boardRoot, BS.GeometryType.CylinderGeometry,
+                    { radius: 0.045, height: 0.104 }, COLORS.boardBase, new BS.Vector3(x, 0, z));
+            }
+        }
+    }
+
+    // A small gold crown: an open band with five points round its top edge.
+    async function createCrown(pos) {
+        const crown = await new BS.GameObject("Crown").Async();
+        await crown.SetParent(state.piecesRoot, false);
+        const t = await crown.AddComponent(new BS.Transform());
+        t.localPosition = pos;
+
+        const radius = 0.12;
+        const band = await new BS.GameObject("Band").Async();
+        await band.SetParent(crown, false);
+        const bt = await band.AddComponent(new BS.Transform());
+        bt.localPosition = new BS.Vector3(0, 0.025, 0);
+        await band.AddComponent(new BS.BanterGeometry(
+            BS.GeometryType.CylinderGeometry, null, 1, 0.05, 1, 1, 1, 1,
+            radius, 32, 0, 6.283185, 0, 6.283185, 8, true, radius, radius
+        ));
+        const shader = config.lighting === 'lit' ? "Standard" : "Unlit/Diffuse";
+        await band.AddComponent(new BS.BanterMaterial(shader, "", hexToVector4(COLORS.crown), BS.MaterialSide.Double, false));
+
+        // Each point is a thin square turned 45 degrees into a diamond, facing outwards
+        for (let i = 0; i < 5; i++) {
+            const a = (i / 5) * Math.PI * 2;
+            const point = await createBanterObject(crown, BS.GeometryType.BoxGeometry,
+                { width: 0.05, height: 0.05, depth: 0.012 }, COLORS.crown,
+                new BS.Vector3(Math.sin(a) * radius, 0.06, Math.cos(a) * radius));
+            point.GetComponent(BS.ComponentType.Transform).localEulerAngles = new BS.Vector3(0, a * 180 / Math.PI, 45);
+        }
+        return crown;
+    }
+
     async function setupGrid() {
         const size = state.tileSize;
+        if (!config.hideBoard) await createBoardBase();
         // Parallelize tile creation
         const tilePromises = [];
         
@@ -761,7 +818,7 @@
                                         BS.GeometryType.SphereGeometry,
                                         { radius: 0.2, height: 0.1 },
                                         COLORS.black, 
-                                        new BS.Vector3(xPos, 0.15, zPos),
+                                        new BS.Vector3(xPos, 0.11, zPos), // Resting on the square
                                         false,
                                         1.0,
                                         null,
@@ -791,17 +848,9 @@
                             const showCrown = game.gameOver && game.winner && game.winner !== 'draw' && cell === game.winner;
                             if (showCrown) {
                                 if (!state.crowns[key]) {
-                                    const crown = await createBanterObject(
-                                        state.piecesRoot,
-                                        BS.GeometryType.CylinderGeometry,
-                                        { radius: 0.15, height: 0.1 },
-                                        '#FFD700', // Gold color
-                                        new BS.Vector3(xPos, 0.25, zPos),
-                                        false
-                                    );
-                                    const ct = crown.GetComponent(BS.ComponentType.Transform);
-                                    ct.localScale = new BS.Vector3(1, 0.5, 1);
-                                    state.crowns[key] = crown;
+                                    // Sits on top of the disc
+                                    const crownY = config.useCustomModels ? 0.22 : 0.17;
+                                    state.crowns[key] = await createCrown(new BS.Vector3(xPos, crownY, zPos));
                                 }
                                 state.crowns[key].SetActive(true);
                             } else {
