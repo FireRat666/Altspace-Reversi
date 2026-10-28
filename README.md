@@ -29,12 +29,18 @@ In a Creator SDK world, add an empty GameObject at the origin, click **Add Compo
   lit="true"
   add-lights="false"
   turn-cooldown="5"
+  sound-volume="0.4"
+  sound-near="2.5"
+  sound-far="10"
   hide-ui="false"
   hide-board="false"
   use-custom-models="true"
   reset-position="0 0 2.5"
   reset-rotation="0 0 0"
   reset-scale="1"
+  mute-position="0 0 0"
+  mute-rotation="0 0 0"
+  mute-scale="1"
   scoreboard-position="0 0 0"
   scoreboard-rotation="0 0 0"
   scoreboard-scale="1">
@@ -77,11 +83,17 @@ Settings can also go in the URL, as in older setups: `https://reversi.firer.at/R
 | `resetPosition` | `reset-position` | `0 0 2.5` | Reset button position, relative to the board. |
 | `resetRotation` | `reset-rotation` | `0 0 0` | Reset button rotation, relative to the board. |
 | `resetScale` | `reset-scale` | `1` | Reset button scale. |
+| `mutePosition` | `mute-position` | `0 0 0` | Where the MUTE button goes, relative to the board. `0 0 0` puts it beside the Reset button, attached to it so it moves with it. MUTE only turns the sounds off for you, and is remembered on your device. |
+| `muteRotation` | `mute-rotation` | `0 0 0` | Rotation of the MUTE button. |
+| `muteScale` | `mute-scale` | `1` | Scale of the MUTE button. |
 | `hideUI` | `hide-ui` | `false` | `true` makes the reset button invisible (it still works and its RESET label stays visible) and hides the turn display. |
 | `scoreboardPosition` | `scoreboard-position` | `0 0 0` | Position of the sign showing whose turn it is, relative to the board. |
 | `scoreboardRotation` | `scoreboard-rotation` | `0 0 0` | Turn sign rotation. |
 | `scoreboardScale` | `scoreboard-scale` | `1` | Turn sign scale. |
 | `turnCooldown` | `turn-cooldown` | `5` | Seconds after a move before the same person can move for the other side, so a double click or an eager player can't take the opponent's turn. Playing both sides alone still works after the wait. `0` turns it off. |
+| `volume` | `sound-volume` | `0.4` | Volume of the sound effects (moves, captures, wins, resets), from `0` to `1`, heard at full strength near the game. `0` turns them off. |
+| `soundNear` | `sound-near` | `2.5` | Distance in metres from the game within which the sounds play at full `sound-volume`. |
+| `soundFar` | `sound-far` | `10` | Distance in metres at which the sounds have faded out completely, so people elsewhere in the world aren't disturbed. |
 | `hideBoard` | `hide-board` | `false` | `true` hides the board, e.g. to use your own. |
 | `useCustomModels` | `use-custom-models` | `true` | Uses the GLB models in `Models/` for the pieces. `false` uses built-in shapes instead. |
 | `lit` |  | `true` | Uses materials that react to scene lights. `false` uses unlit materials that ignore lighting. |
