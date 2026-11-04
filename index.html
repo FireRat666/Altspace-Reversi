@@ -9,7 +9,7 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#00ff44">
     <title>3D Multiplayer Reversi (Othello) for AltspaceVR &amp; BanterVR | FireR.at</title>
-    <meta name="description" content="Synced 3D multiplayer Reversi (Othello) board with a reset button for AltspaceVR (altvr.app) and BanterVR spaces. Drop-in <script> tag setup.">
+    <meta name="description" content="Synced 3D multiplayer Reversi (Othello) board with seat locking for AltspaceVR (altvr.app) and BanterVR spaces. Drop-in <script> tag setup.">
     <meta name="keywords" content="VR Reversi, Othello VR, AltspaceVR Reversi, BanterVR Reversi, 3D multiplayer Othello board, FireRat">
     <meta name="author" content="FireRat">
     <meta name="robots" content="index, follow">
@@ -32,7 +32,7 @@
       "name": "3D Reversi (Othello) for AltspaceVR & BanterVR",
       "url": "https://reversi.firer.at/",
       "image": "https://cdn.sidequestvr.com/file/4763902/altspace-photo-20261027-211340-f13d.jpg",
-      "description": "Synced 3D multiplayer Reversi (Othello) board with a reset button for AltspaceVR (altvr.app) and BanterVR spaces.",
+      "description": "Synced 3D multiplayer Reversi (Othello) board with seat locking for AltspaceVR (altvr.app) and BanterVR spaces.",
       "genre": ["Board Game", "Strategy Game", "Multiplayer VR"],
       "gamePlatform": ["AltspaceVR", "BanterVR"],
       "playMode": "MultiPlayer",
@@ -107,12 +107,12 @@
         <div class="code-header">Script tag</div>
         <pre><code>&lt;script src=&quot;https://reversi.firer.at/Reversi.js&quot; position=&quot;0 1.1 -2&quot;&gt;&lt;/script&gt;</code></pre>
         <p>All the settings are listed on <a href="https://github.com/FireRat666/Banter-Reversi#settings" target="_blank">GitHub</a>.</p>
-        <p>A position of <code>0 0 0</code> means automatic: the turn sign sits in its default spot next to the board. Any other value places it relative to the board.</p>
+        <p>A position of <code>0 0 0</code> means automatic: the UI panel sits just above the board. Any other value places it relative to the board.</p>
       </section>
 
       <section class="info-block">
         <h2>Features</h2>
-        <ul><li>Valid moves highlighted in blue</li><li>Turns pass automatically when a player has no move</li><li>Reset button</li><li>Several independent boards in one world</li></ul>
+        <ul><li>Valid moves highlighted in blue</li><li>Turns pass automatically when a player has no move</li><li>A turn panel with seats, Reset and Mute</li><li>Seat locking</li><li>Switches itself off when you are far away</li><li>Several independent boards in one world</li></ul>
       </section>
 
       <section class="info-block">
@@ -122,7 +122,7 @@
     </main>
 
     <footer>
-      <p>Synced multiplayer Reversi (Othello) board with a reset button. Open <a href="https://reversi.firer.at">reversi.firer.at</a> as a space in Altspace or Banter to try it.</p>
+      <p>Synced multiplayer Reversi (Othello) board with seat locking. Open <a href="https://reversi.firer.at">reversi.firer.at</a> as a space in Altspace or Banter to try it.</p>
       <p>&copy; <span class="fire-year"></span> <a href="https://firer.at/">FireR.at</a></p>
     </footer>
   </div>
@@ -184,7 +184,7 @@
     -->
     <!-- snippet section -->
     <bs-snippet name="reversi" title="Reversi"
-      description="Synced multiplayer Reversi (Othello) board with a reset button."
+      description="Synced multiplayer Reversi (Othello) board with seat locking."
       script="https://reversi.firer.at/snippet.js"
       room=""
       position="0 1 3"
@@ -193,18 +193,14 @@
       lit="true"
       add-lights="false"
       turn-cooldown="5"
+      lock-timeout="90"
+      cull-distance="20"
       sound-volume="0.4"
       sound-near="2.5"
       sound-far="10"
       hide-ui="false"
       hide-board="false"
       use-custom-models="true"
-      reset-position="0 0 2.5"
-      reset-rotation="0 0 0"
-      reset-scale="1"
-      mute-position="0 0 0"
-      mute-rotation="0 0 0"
-      mute-scale="1"
       scoreboard-position="0 0 0"
       scoreboard-rotation="0 0 0"
       scoreboard-scale="1">
